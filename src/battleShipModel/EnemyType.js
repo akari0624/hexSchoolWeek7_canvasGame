@@ -1,0 +1,1 @@
+export const YELLOW_GUN_RUNNER = 'yellowGunRunner'
