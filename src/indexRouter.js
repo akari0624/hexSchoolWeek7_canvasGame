@@ -8,7 +8,7 @@ import { centerCanonCoreRadius, BULLET_SPEED,
 
 import { isTheyCollideAndReturnSecondFilteredArr }  from './battleShipModel/gameLogic'
 
-let GLOBAL_ANGLE = 0
+export let GLOBAL_ANGLE = 0
 
 let shouldRecycleBulletCounter = 0
 

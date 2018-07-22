@@ -1,6 +1,6 @@
 import { YELLOW_GUN_RUNNER }  from './EnemyType'
 import { OUTTER_ROUND_RADIUS } from './GameGlobalParameter'
-
+import { GLOBAL_ANGLE } from '../indexRouter'
 
 
 const drawYellowGunRunner = (enemy, ctx, centerX, centerY) => {
