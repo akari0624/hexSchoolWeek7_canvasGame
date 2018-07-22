@@ -2,7 +2,7 @@
 
 
 ### DEMO page
-- [on github page]()
+- [on github page](https://akari0624.github.io/hexSchoolWeek7_canvasGame/)
 
 ### 本週相關資訊
 - [主辦單位提供的參考設計稿](https://hackmd.io/N5yEjm2vSx6D41qAbJGDmw)
