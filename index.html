@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <style>
+      html, body{
+       margin:0;
+       padding:0;
+       width:100vw;
+       height:100vh;
+      }
+   
+      *{
+        box-sizing: border-box;
+      }
+   
+   
+      #theBackgroundCanvas{
+        position:absolute;
+        top:0;
+        left:0;
+        z-index:1
+      }
+   
+      #theBattleCanvas{
+       position:absolute;
+       top:0;
+       left:0;
+       z-index:2;
+       background:transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" style="width:100%;height:100%"></div>
+
+
+    <!-- 使用HtmlWebPackPlugin 的話 這邊就不用自己打 webpack會幫忙填入，自己打的話 會變載入兩次 bundle.js!-->
+  <!-- <script src="/bundle.js"></script> -->
+<script type="text/javascript" src="/hexSchoolWeek7_canvasGame/vendors~main.9ed0c24539aaf90368fc.js"></script><script type="text/javascript" src="/hexSchoolWeek7_canvasGame/main.6b1e0d00abcbd25b690e.js"></script></body>
+  
+
+
+</html>
