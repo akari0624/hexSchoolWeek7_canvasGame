@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import Enemy from './battleShipModel/Enemy'
 import { YELLOW_GUN_RUNNER } from './battleShipModel/EnemyType'
-import Bullet from './battleShipModel/Bullet'
+import BulletFactory from './battleShipModel/Bullet'
 import { NORMAL_BULLET } from './battleShipModel/BulletType'
 import { centerCanonCoreRadius, BULLET_SPEED, 
   HOW_MANY_FRAMES_COUNT_OUT_OF_BORDER_BULLETS,
@@ -10,7 +10,7 @@ import { centerCanonCoreRadius, BULLET_SPEED,
 
 import { isTheyCollideAndReturnSecondFilteredArr }  from './battleShipModel/gameLogic'
 
-export let GLOBAL_ANGLE = 0
+let GLOBAL_ANGLE = 0
 
 let shouldRecycleBulletCounter = 0
 
@@ -160,7 +160,7 @@ const canvasOnMouseMoveCurry = (centerX, centerY) => (e) => {
   const currAngle = tmpNum * 180 / Math.PI
 
   GLOBAL_ANGLE = Math.round(currAngle)
-  console.log(GLOBAL_ANGLE)   // 第二象限 0~90(+ +),  第四象限 91~180(- +), 第三象限 -91 ~ -180(- -), 第一象限 -0 ~ -90(+ -),
+  // console.log(GLOBAL_ANGLE)   // 第二象限 0~90(+ +),  第四象限 91~180(- +), 第三象限 -91 ~ -180(- -), 第一象限 -0 ~ -90(+ -),
 
 }
 
@@ -217,8 +217,8 @@ const onPlayerKeydownCurry = (GameState) => (e) => {
   // 87 -> w
   if (currKey === 87) {
 
-    //從砲口射出去,所以不會是0,如果是0 就是從中心射出去
-    const bullet = new Bullet(NORMAL_BULLET, GLOBAL_ANGLE, 45, 45)
+  
+    const bullet = BulletFactory(NORMAL_BULLET, GLOBAL_ANGLE)
 
     GameState.bulletsArr = [
       ...GameState.bulletsArr,
@@ -235,6 +235,27 @@ const initTheEnemies = (GameStateObj) => {
     .enemysArr
     .push(new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 30), new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 60), new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 120),)
 }
+
+
+
+const bindEventToWindowAndCanvas = (centerX, centerY, GameStateObj, battleCanvasRef) => {
+
+
+  canvasOnMouseMoveHandler = canvasOnMouseMoveCurry(centerX, centerY)
+  onPlayerKeydownHandler = onPlayerKeydownCurry(GameStateObj)
+
+  battleCanvasRef.addEventListener('mousemove', canvasOnMouseMoveHandler)
+
+  window.addEventListener('keydown', onPlayerKeydownHandler)
+
+}
+
+const removeEventHandler = (battleCanvasRef) => {
+
+  battleCanvasRef.removeEventListener('mousemove', canvasOnMouseMoveHandler)
+  window.removeEventListener('keydown', onPlayerKeydownHandler)
+
+} 
 
 
 let canvasOnMouseMoveHandler = null
@@ -285,7 +306,6 @@ export default class IndexRoute extends Component {
    
     const canonLineWidth = 5
 
-    canvasOnMouseMoveHandler = canvasOnMouseMoveCurry(centerX, centerY)
 
     const GameState = {
       bulletsArr: [],
@@ -294,20 +314,15 @@ export default class IndexRoute extends Component {
       outterRadius: 100
     }
 
-    onPlayerKeydownHandler = onPlayerKeydownCurry(GameState)
 
-    this
-      .battleCanvasRef
-      .addEventListener('mousemove', canvasOnMouseMoveHandler)
-
-    window.addEventListener('keydown', onPlayerKeydownHandler)
+    bindEventToWindowAndCanvas(centerX, centerY, GameState, this.battleCanvasRef)
 
     const theGameLoopCurry = GameState => () => {
 
       clearAll(context, wholeWidth, wholeHeight)
 
       drawCannon(centerX, centerY, context, centerCanonCoreRadius, canonLineColor, canonLineWidth)
-      
+
       drawBullet(GameState.bulletsArr, context, centerX, centerY)
       updateBullet(GameState.bulletsArr, GameState.bulletSpeed)
 
@@ -334,8 +349,8 @@ export default class IndexRoute extends Component {
 
   componentWillUnmount(){
 
-    this.battleCanvasRef.removeEventListener('mousemove', canvasOnMouseMoveHandler)
-    window.removeEventListener('keydown', onPlayerKeydownHandler)
+  
+    removeEventHandler(this.battleCanvasRef)
 
     this.battleCanvasRef = null
     this.bgCanvasRef = null
