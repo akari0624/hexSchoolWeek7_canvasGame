@@ -1,6 +1,8 @@
 import React, {Component} from 'react'
 import Enemy from './battleShipModel/Enemy'
 import { YELLOW_GUN_RUNNER } from './battleShipModel/EnemyType'
+import Bullet from './battleShipModel/Bullet'
+import { NORMAL_BULLET } from './battleShipModel/BulletType'
 import { centerCanonCoreRadius, BULLET_SPEED, 
   HOW_MANY_FRAMES_COUNT_OUT_OF_BORDER_BULLETS,
   BULLET_RADIUS
@@ -66,7 +68,7 @@ const drawCannon = (cX, cY, ctx, radius, canonLineColor, canonLineWidth) => {
 
   drawCannonOutterDotLine(ctx, radius, 20, 30, '#D3D3D3')
 
-  // 轉canvas的角度  然後再畫
+  // 轉canvas的角度  然後再畫   
   ctx.rotate((GLOBAL_ANGLE - 270) * Math.PI / 180)
 
   ctx.beginPath()
@@ -122,28 +124,24 @@ const drawBackground = (ctx, wholeX, wholeY, bgColorHex) => {
 
 }
 
-const drawBullet = (bulletsArr, ctx, centerX, centerY, canonCoreRadius, bulletSpeed) => {
+const drawBullet = (bulletsArr, ctx, centerX, centerY) => {
 
-  const _updateBullet = (b) => {
-
-    b.x = b.x + bulletSpeed
-    b.y = b.y + bulletSpeed
-
-  }
-  
 
   bulletsArr.forEach(b => {
 
-    ctx.translate(centerX, centerY)
-    ctx.rotate((b.angle - 45) * Math.PI / 180)
-    ctx.beginPath()
-    ctx.arc(b.x, b.y, BULLET_RADIUS, 0, 2 * Math.PI, false)
-    ctx.fill()
-    ctx.stroke()
+    b.draw(ctx, centerX, centerY,BULLET_RADIUS)
 
-    _updateBullet(b)
+  })
 
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+const updateBullet = (bulletsArr, bulletSpeed) => {
+
+
+  bulletsArr.forEach(b => {
+
+    b.update(bulletSpeed)
+
   })
 
 }
@@ -162,7 +160,7 @@ const canvasOnMouseMoveCurry = (centerX, centerY) => (e) => {
   const currAngle = tmpNum * 180 / Math.PI
 
   GLOBAL_ANGLE = Math.round(currAngle)
-  // console.log(GLOBAL_ANGLE)
+  console.log(GLOBAL_ANGLE)   // 第二象限 0~90(+ +),  第四象限 91~180(- +), 第三象限 -91 ~ -180(- -), 第一象限 -0 ~ -90(+ -),
 
 }
 
@@ -219,12 +217,8 @@ const onPlayerKeydownCurry = (GameState) => (e) => {
   // 87 -> w
   if (currKey === 87) {
 
-    const bullet = {
-      type: 'normal',
-      angle: GLOBAL_ANGLE,
-      x: 45, //從砲口射出去,所以不會是0,如果是0 就是從中心射出去
-      y: 45
-    }
+    //從砲口射出去,所以不會是0,如果是0 就是從中心射出去
+    const bullet = new Bullet(NORMAL_BULLET, GLOBAL_ANGLE, 45, 45)
 
     GameState.bulletsArr = [
       ...GameState.bulletsArr,
@@ -247,6 +241,13 @@ let canvasOnMouseMoveHandler = null
 let onPlayerKeydownHandler = null
 
 export default class IndexRoute extends Component {
+
+  constructor(props){
+    super(props)
+
+    this.bgCanvasRef = null
+    this.battleCanvasRef = null
+  }
 
   render() {
 
@@ -306,7 +307,10 @@ export default class IndexRoute extends Component {
       clearAll(context, wholeWidth, wholeHeight)
 
       drawCannon(centerX, centerY, context, centerCanonCoreRadius, canonLineColor, canonLineWidth)
-      drawBullet(GameState.bulletsArr, context, centerX, centerY, centerCanonCoreRadius, GameState.bulletSpeed)
+      
+      drawBullet(GameState.bulletsArr, context, centerX, centerY)
+      updateBullet(GameState.bulletsArr, GameState.bulletSpeed)
+
       drawEnemys(context, GameState.enemysArr, centerX, centerY)
       updateEnemys(GameState.enemysArr)
 
