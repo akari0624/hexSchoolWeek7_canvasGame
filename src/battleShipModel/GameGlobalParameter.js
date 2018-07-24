@@ -8,6 +8,6 @@ export let BULLET_RADIUS = 5
 
 export let HITTED_ANIMATION_FRAMES = 60
 
-
+export let BOOM_IMAGE_ENLARGE_RATE = 20
 export const BOOM_IMG_KEY = 'boom'
 export let AssetImageMap = new Map()

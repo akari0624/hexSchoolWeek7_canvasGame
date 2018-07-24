@@ -2,7 +2,7 @@ import { YELLOW_GUN_RUNNER }  from './EnemyType'
 import { OUTTER_ROUND_RADIUS } from './GameGlobalParameter'
 
 
-import { AssetImageMap, BOOM_IMG_KEY } from './GameGlobalParameter'
+import { AssetImageMap, BOOM_IMG_KEY, BOOM_IMAGE_ENLARGE_RATE } from './GameGlobalParameter'
 
 
 const drawYellowGunRunner = (enemy, ctx, centerX, centerY) => {
@@ -21,9 +21,10 @@ const drawYellowGunRunner = (enemy, ctx, centerX, centerY) => {
 
 const drawYellowGunRunnerBoom = (enemy, ctx, centerX, centerY) => {
 
+  const boomImage = AssetImageMap.get(BOOM_IMG_KEY)
   ctx.save()
   ctx.translate( centerX, centerY)
-  ctx.drawImage(AssetImageMap.get(BOOM_IMG_KEY), enemy.x, enemy.y)
+  ctx.drawImage(boomImage, enemy.x, enemy.y, boomImage.width * (enemy.hittedAnimationFrames / BOOM_IMAGE_ENLARGE_RATE), boomImage.height * (enemy.hittedAnimationFrames / BOOM_IMAGE_ENLARGE_RATE))
   ctx.restore()
 
 } 
