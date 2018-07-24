@@ -1,14 +1,14 @@
-import { renderComponent , expect } from '../test_helper'
-import App from '../../src/components/app'
+// import { renderComponent , expect } from '../test_helper'
+// import IndexPage from '../../src/indexRouter'
 
-describe('App' , () => {
-  let component
+// describe('IndexPageHas Appear' , () => {
+//   let component
 
-  beforeEach(() => {
-    component = renderComponent(App)
-  })
+//   beforeEach(() => {
+//     component = renderComponent(IndexPage)
+//   })
 
-  it('renders something', () => {
-    expect(component).to.exist
-  })
-})
+//   it('renders something', () => {
+//     expect(component).to.exist
+//   })
+// })
