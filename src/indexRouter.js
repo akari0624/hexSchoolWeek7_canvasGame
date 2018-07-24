@@ -1,19 +1,19 @@
 import React, {Component} from 'react'
 import Enemy from './battleShipModel/Enemy'
-import { YELLOW_GUN_RUNNER } from './battleShipModel/EnemyType'
+import {YELLOW_GUN_RUNNER} from './battleShipModel/EnemyType'
 import BulletFactory from './battleShipModel/Bullet'
-import { NORMAL_BULLET } from './battleShipModel/BulletType'
-import { centerCanonCoreRadius, BULLET_SPEED, 
-  HOW_MANY_FRAMES_COUNT_OUT_OF_BORDER_BULLETS,
-  BULLET_RADIUS
-} from './battleShipModel/GameGlobalParameter'
+import {NORMAL_BULLET} from './battleShipModel/BulletType'
+import {centerCanonCoreRadius, BULLET_SPEED, HOW_MANY_FRAMES_COUNT_OUT_OF_BORDER_BULLETS, BULLET_RADIUS, BOOM_IMG_KEY} from './battleShipModel/GameGlobalParameter'
 
-import { isTheyCollideAndReturnSecondFilteredArr }  from './battleShipModel/gameLogic'
+import {isTheyCollideAndReturnSecondFilteredArr} from './battleShipModel/gameLogic'
+import ImageLoader from './battleShipModel/imageLoaderUtil'
+
+import BoomImgSrc from '../asset/png/boom.png'
+import {AssetImageMap} from './battleShipModel/GameGlobalParameter'
 
 let GLOBAL_ANGLE = 0
 
 let shouldRecycleBulletCounter = 0
-
 
 const drawCannon = (cX, cY, ctx, radius, canonLineColor, canonLineWidth) => {
 
@@ -68,7 +68,7 @@ const drawCannon = (cX, cY, ctx, radius, canonLineColor, canonLineWidth) => {
 
   drawCannonOutterDotLine(ctx, radius, 20, 30, '#D3D3D3')
 
-  // 轉canvas的角度  然後再畫   
+  // 轉canvas的角度  然後再畫
   ctx.rotate((GLOBAL_ANGLE - 270) * Math.PI / 180)
 
   ctx.beginPath()
@@ -126,17 +126,15 @@ const drawBackground = (ctx, wholeX, wholeY, bgColorHex) => {
 
 const drawBullet = (bulletsArr, ctx, centerX, centerY) => {
 
-
   bulletsArr.forEach(b => {
 
-    b.draw(ctx, centerX, centerY,BULLET_RADIUS)
+    b.draw(ctx, centerX, centerY, BULLET_RADIUS)
 
   })
 
 }
 
 const updateBullet = (bulletsArr, bulletSpeed) => {
-
 
   bulletsArr.forEach(b => {
 
@@ -160,7 +158,6 @@ const canvasOnMouseMoveCurry = (centerX, centerY) => (e) => {
   const currAngle = tmpNum * 180 / Math.PI
 
   GLOBAL_ANGLE = Math.round(currAngle)
-  // console.log(GLOBAL_ANGLE)   // 第二象限 0~90(+ +),  第四象限 91~180(- +), 第三象限 -91 ~ -180(- -), 第一象限 -0 ~ -90(+ -),
 
 }
 
@@ -178,14 +175,13 @@ const recycleOutOfScopeBullets = (bulletsArr, wholeWidth, wholeHeight) => {
 
   }
 
-  if(shouldRecycleBulletCounter > HOW_MANY_FRAMES_COUNT_OUT_OF_BORDER_BULLETS){
-    
+  if (shouldRecycleBulletCounter > HOW_MANY_FRAMES_COUNT_OUT_OF_BORDER_BULLETS) {
 
     return bulletsArr.filter(b => countIsBulletOutOfBorder(b))
 
-  }else{
+  } else {
     shouldRecycleBulletCounter += 1;
-  
+
     return bulletsArr
   }
 }
@@ -217,7 +213,6 @@ const onPlayerKeydownCurry = (GameState) => (e) => {
   // 87 -> w
   if (currKey === 87) {
 
-  
     const bullet = BulletFactory(NORMAL_BULLET, GLOBAL_ANGLE)
 
     GameState.bulletsArr = [
@@ -230,16 +225,12 @@ const onPlayerKeydownCurry = (GameState) => (e) => {
 
 const initTheEnemies = (GameStateObj) => {
 
-  
   GameStateObj
     .enemysArr
-    .push(new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 30), new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 60), new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 120),)
+    .push(new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 30), new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 60), new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 120), new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 240), new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 340), new Enemy(0, 0, 1, YELLOW_GUN_RUNNER, 360),)
 }
 
-
-
 const bindEventToWindowAndCanvas = (centerX, centerY, GameStateObj, battleCanvasRef) => {
-
 
   canvasOnMouseMoveHandler = canvasOnMouseMoveCurry(centerX, centerY)
   onPlayerKeydownHandler = onPlayerKeydownCurry(GameStateObj)
@@ -255,15 +246,14 @@ const removeEventHandler = (battleCanvasRef) => {
   battleCanvasRef.removeEventListener('mousemove', canvasOnMouseMoveHandler)
   window.removeEventListener('keydown', onPlayerKeydownHandler)
 
-} 
-
+}
 
 let canvasOnMouseMoveHandler = null
 let onPlayerKeydownHandler = null
 
 export default class IndexRoute extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props)
 
     this.bgCanvasRef = null
@@ -292,7 +282,9 @@ export default class IndexRoute extends Component {
     this.bgCanvasRef.width = window.innerWidth
     this.bgCanvasRef.height = window.innerHeight
 
-    const context = this.battleCanvasRef.getContext('2d')
+    const context = this
+      .battleCanvasRef
+      .getContext('2d')
     this.battleCanvasRef.width = window.innerWidth
     this.battleCanvasRef.height = window.innerHeight
 
@@ -302,10 +294,7 @@ export default class IndexRoute extends Component {
     const centerX = wholeWidth / 2
     const centerY = wholeHeight / 2
 
-
-   
     const canonLineWidth = 5
-
 
     const GameState = {
       bulletsArr: [],
@@ -314,8 +303,9 @@ export default class IndexRoute extends Component {
       outterRadius: 100
     }
 
-
     bindEventToWindowAndCanvas(centerX, centerY, GameState, this.battleCanvasRef)
+
+    let gameLoopRun = null
 
     const theGameLoopCurry = GameState => () => {
 
@@ -332,24 +322,38 @@ export default class IndexRoute extends Component {
       GameState.enemysArr = isTheyCollideAndReturnSecondFilteredArr(GameState.bulletsArr, GameState.enemysArr)
       GameState.bulletsArr = recycleOutOfScopeBullets(GameState.bulletsArr, wholeWidth, wholeHeight)
 
-
       requestAnimationFrame(gameLoopRun)
 
     }
 
-    initTheEnemies(GameState)
+    const imageToLoadSRCArr = [BoomImgSrc]
+    
 
-    const gameLoopRun = theGameLoopCurry(GameState)
+    console.log('call module')
+    const imageObjArr = ImageLoader(imageToLoadSRCArr)
+    
+    try{
+      imageObjArr.then((arr) => {
+        console.log('on all resolve')
+        AssetImageMap.set(BOOM_IMG_KEY, arr[0])
+        initTheEnemies(GameState)
+        gameLoopRun = theGameLoopCurry(GameState)
+        drawBackground(bgContext, wholeWidth, wholeHeight, bgColor)
+        gameLoopRun()
+      })
 
-    drawBackground(bgContext, wholeWidth, wholeHeight, bgColor)
+    }catch(err){
 
-    gameLoopRun()
+      console.log(`讀取圖片時發生錯誤：${err}`)
+    }
+     
+      
+
 
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
 
-  
     removeEventHandler(this.battleCanvasRef)
 
     this.battleCanvasRef = null

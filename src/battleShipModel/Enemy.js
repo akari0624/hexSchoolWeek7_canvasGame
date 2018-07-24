@@ -2,6 +2,8 @@ import { YELLOW_GUN_RUNNER }  from './EnemyType'
 import { OUTTER_ROUND_RADIUS } from './GameGlobalParameter'
 
 
+import { AssetImageMap, BOOM_IMG_KEY } from './GameGlobalParameter'
+
 
 const drawYellowGunRunner = (enemy, ctx, centerX, centerY) => {
 
@@ -12,6 +14,16 @@ const drawYellowGunRunner = (enemy, ctx, centerX, centerY) => {
   ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI*2, false)
   ctx.fill()
 
+  ctx.restore()
+
+} 
+
+
+const drawYellowGunRunnerBoom = (enemy, ctx, centerX, centerY) => {
+
+  ctx.save()
+  ctx.translate( centerX, centerY)
+  ctx.drawImage(AssetImageMap.get(BOOM_IMG_KEY), enemy.x, enemy.y)
   ctx.restore()
 
 } 
@@ -28,6 +40,9 @@ class Enemy{
     this.deg = deg | 30
     this.type = type
     this.radius = radius | 30
+
+    this.ishitted = false
+    this.hittedAnimationFrames = 0
     
   }
 
@@ -39,8 +54,14 @@ class Enemy{
       if(!ctx){
         throw new Error(' canvas context not setted!! ')
       }
-
-      drawYellowGunRunner(this, ctx,  centerX, centerY)
+      if(this.isHitted){
+      
+        drawYellowGunRunnerBoom(this, ctx,  centerX, centerY)
+        this.hittedAnimationFrames += 1
+      }else{
+      
+        drawYellowGunRunner(this, ctx,  centerX, centerY)
+      }
     }
 
   }

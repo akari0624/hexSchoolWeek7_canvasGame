@@ -1,4 +1,4 @@
-import {BULLET_RADIUS} from '../GameGlobalParameter'
+import { BULLET_RADIUS, HITTED_ANIMATION_FRAMES } from '../GameGlobalParameter'
 
 
 export const isTheyCollideAndReturnSecondFilteredArr = (bullletsArr, enemysArr) => {
@@ -10,9 +10,20 @@ export const isTheyCollideAndReturnSecondFilteredArr = (bullletsArr, enemysArr) 
 
     filteredArr = filteredArr.filter(e => {
 
-      if (!isTwoCircleCollide(b.x, b.y, BULLET_RADIUS, e.x, e.y, e.radius)) {
+      const isColide = isTwoCircleCollide(b.x, b.y, BULLET_RADIUS, e.x, e.y, e.radius)
+      if(isColide && !e.isHitted){
+       
+        e.isHitted = true
         return e
+      }else if(e.isHitted && e.hittedAnimationFrames < HITTED_ANIMATION_FRAMES){
+       
+        return e
+
+      }else if(!isColide && !e.isHitted ) {
+        return e
+
       }
+
     })
   })
 
