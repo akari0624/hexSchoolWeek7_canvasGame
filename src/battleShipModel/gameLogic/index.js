@@ -14,16 +14,16 @@ export const isTheyCollideAndReturnSecondFilteredArr = (bullletsArr, enemysArr) 
       if(isColide && !e.isHitted){
        
         e.isHitted = true
-        return e
+        return true
       }else if(e.isHitted && e.hittedAnimationFrames < HITTED_ANIMATION_FRAMES){
        
-        return e
+        return true
 
       }else if(!isColide && !e.isHitted ) {
-        return e
+        return true
 
       }
-
+      return false 
     })
   })
 
